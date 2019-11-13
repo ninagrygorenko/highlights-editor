@@ -1,17 +1,16 @@
-import { AddHighlightCommand } from "./AddHighlightCommand";
-import { RemoveHighlightCommand } from "./RemoveHighlightCommand";
+import { AddHighlightCommand } from "./AddHighlight.command";
+import { RemoveHighlightCommand } from "./RemoveHighlight.command";
 
 export enum CommandTypes {
 	ADD_HIGHLIGHT,
 	REMOVE_HIGHLIGHT,
-	ADD_TEXT,
+	EDITOR_STATE_CHANGE,
 }
 
 export interface EditorCommand {
 	type: CommandTypes;
 	id: string;
-	undoCommand: () => HighlightCommand;
+	undoCommand: () => EditorCommand;
 }
 
 export type HighlightCommand = AddHighlightCommand | RemoveHighlightCommand;
-

@@ -18,12 +18,17 @@ const HighlightCreation: React.FC<HighlightCreationProps> = (props: HighlightCre
 	};
 
 	return (
-		<form className="highlight-add-form" onSubmit={handleSubmit}>
+		<form
+			className="highlight-add-form"
+			onSubmit={handleSubmit}
+		>
 			<label>Word #:</label>
 			<input
 				type="number"
 				placeholder="word index starting 0"
 				min={0}
+				required={true}
+				tabIndex={-1}
 				onChange={event => setWordNumber(some(Number.parseInt(event.target.value, 10)))}/>
 			<label>Color:</label>
 			<input
@@ -31,6 +36,7 @@ const HighlightCreation: React.FC<HighlightCreationProps> = (props: HighlightCre
 				placeholder="hex - 66ff88"
 				pattern="^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
 				required={true}
+				tabIndex={-1}
 				onChange={event => setColor(some(event.target.value))}/>
 			<button type="submit">Add</button>
 		</form>

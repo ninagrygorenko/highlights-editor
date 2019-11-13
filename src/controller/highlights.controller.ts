@@ -1,27 +1,21 @@
 import { Subject } from "rxjs";
-import { AddHighlightCommand } from "./commands/AddHighlightCommand";
 import { scan } from "rxjs/operators";
-import { RemoveHighlightCommand } from "./commands/RemoveHighlightCommand";
-import { CommandTypes, EditorCommand, HighlightCommand } from "./commands/CommandTypes";
+import { AddHighlightCommand, CommandTypes, EditorCommand, HasHighlight, HighlightCommand, RemoveHighlightCommand } from "../model";
+import { HistoryController } from "./history.controller";
 
-export interface HasHighlight {
-	id: string;
-	wordNumber: number;
-	color: string;
-}
-
-class HighlightsStore {
+class HighlightsController {
 
 	public highlightCommand$: Subject<HighlightCommand> = new Subject();
 	public highlightsList$: Subject<AddHighlightCommand[]> = new Subject();
 	public editorHighlights$: Subject<Record<number, HasHighlight[]>> = new Subject();
 
-	constructor() {
+	constructor(private historyController: HistoryController) {
 		this.initialize();
 	}
 
 	public emitHighlightCommand = (command: HighlightCommand) => {
 		this.highlightCommand$.next(command);
+		this.historyController.addExecutedCommand(command);
 	};
 
 	public addHighlight = (wordNumber: number, color: string): void => {
@@ -39,8 +33,7 @@ class HighlightsStore {
 	private initialize = () => {
 		this.initializeHighlightList();
 		this.initializeEditorHighlights();
-
-		this.addHighlightTestData();
+		this.initializeHistory();
 	};
 
 	private initializeHighlightList = () => {
@@ -95,19 +88,26 @@ class HighlightsStore {
 		});
 	};
 
-	addHighlightTestData = () => {
+	private initializeHistory = () => {
+		this.historyController.restoreHistoryCommands$.asObservable().subscribe(command => {
+			switch (command.type) {
+				case CommandTypes.ADD_HIGHLIGHT:
+				case CommandTypes.REMOVE_HIGHLIGHT:
+					this.highlightCommand$.next(command as HighlightCommand);
+			}
+		});
+	};
+
+	public addHighlightTestData = () => {
 		// test data
 		this.highlightCommand$.next(new AddHighlightCommand(5, "f0f"));
 		this.highlightCommand$.next(new AddHighlightCommand(1, "ff0"));
 		this.highlightCommand$.next(new AddHighlightCommand(1, "f00"));
-		const commandToUndo = new AddHighlightCommand(2, "0fe");
-		this.highlightCommand$.next(commandToUndo);
-		this.highlightCommand$.next(new RemoveHighlightCommand(commandToUndo));
 		this.highlightCommand$.next(new AddHighlightCommand(2, "0fe"));
 		// end test data
 	}
 }
 
 export {
-	HighlightsStore,
+	HighlightsController,
 };

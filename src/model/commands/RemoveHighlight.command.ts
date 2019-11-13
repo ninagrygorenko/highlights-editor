@@ -1,5 +1,5 @@
-import { CommandTypes, EditorCommand, HighlightCommand } from "./CommandTypes";
-import { AddHighlightCommand } from "./AddHighlightCommand";
+import { CommandTypes, EditorCommand } from "./CommandTypes";
+import { AddHighlightCommand } from "./AddHighlight.command";
 
 class RemoveHighlightCommand implements EditorCommand {
 
@@ -9,14 +9,14 @@ class RemoveHighlightCommand implements EditorCommand {
 	id: string = `f${(~~(Math.random()*1e8)).toString(16)}`;
 
 	getCommandId = (): string => {
-		return this.command.id;
+		return `${this.command.id}`;
 	};
 
 	getWordNumber = (): number => {
 		return this.command.wordNumber;
 	};
 
-	undoCommand = (): HighlightCommand => {
+	undoCommand = (): AddHighlightCommand => {
 		return new AddHighlightCommand(this.command.wordNumber, this.command.color);
 	};
 }
