@@ -1,7 +1,6 @@
 import React from "react";
-import { ParagraphBlock, TextBlock, TextBlockType } from "../../model/TextBlock";
+import { HasHighlight, ParagraphBlock, TextBlock, TextBlockType } from "../../model";
 import { isSome, Option } from "fp-ts/lib/Option";
-import { HasHighlight } from "../../model";
 import { HighlightedWord } from "./HighlightedWord";
 
 export interface ParagraphProps {
@@ -56,7 +55,7 @@ const Paragraph: React.FC<ParagraphProps> = props => {
 	if (renderedText.length === 0) {
 		renderedText.push(<br/>);
 	}
-	const key = paragraphBlock.blocks.length > 0 ? paragraphBlock.hash : index;
+	const key = paragraphBlock.blocks.length > 0 ? paragraphBlock.hash : `p${index}`;
 	return (
 		<div key={key} ref={ref => paragraphBlock.ref = ref}>
 			{renderedText}

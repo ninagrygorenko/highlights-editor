@@ -3,7 +3,7 @@ import { ParagraphBlock, TextBlockType } from "../../model";
 
 it('parseTextToBlocks - empty', () => {
 	const result = parseTextToBlocks("");
-	expect(result).toHaveLength(0);
+	expect(result.blocks).toHaveLength(0);
 });
 
 it('parseTextToBlocks - normal text', () => {
@@ -27,7 +27,7 @@ it('parseTextToBlocks - two words', () => {
 	expect(result.blocks).toHaveLength(3);
 	expect(result.blocks[0].type).toEqual(TextBlockType.WORD);
 	expect(result.blocks[1].type).toEqual(TextBlockType.WHITESPACE);
-	expect(result.blocks[1].type).toEqual(TextBlockType.WORD);
+	expect(result.blocks[2].type).toEqual(TextBlockType.WORD);
 });
 
 it("getParagraphByContent", () => {
