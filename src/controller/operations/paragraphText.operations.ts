@@ -1,13 +1,22 @@
 import { ParagraphBlock, TextBlock, TextBlockType } from "../../model";
 
-const wordLetterRegexp = /[0-9a-zA-z-]/;
+const wordLetterRegexp = /[0-9a-zA-z]/;
+const inWordNonLetterRegexp = /[-']/;
 
 const parseTextToBlocks = (text: string): { blocks: Array<TextBlock>, wordsCount: number } => {
 	const result: Array<TextBlock> = [];
 	let wordsCount = 0;
 	let currentBlock: TextBlock = { type: TextBlockType.WORD, content: ""};
 	for (let i = 0; i < text.length; i++) {
-		const charType = text[i].match(wordLetterRegexp) ? TextBlockType.WORD :  TextBlockType.WHITESPACE;
+		let charType = text[i].match(wordLetterRegexp) ? TextBlockType.WORD : TextBlockType.WHITESPACE;
+
+		// special case when ' or - symbol should follow some alphabetical character. In other cases it is not a word
+		if (charType === TextBlockType.WHITESPACE
+			&& text[i].match(inWordNonLetterRegexp)
+			&& currentBlock.type === TextBlockType.WORD
+			&& currentBlock.content.charAt(currentBlock.content.length - 1).match(wordLetterRegexp)) {
+			charType = TextBlockType.WORD;
+		}
 		if (currentBlock.type !== charType) {
 			if (currentBlock.content.length > 0) {
 				result.push(currentBlock);
@@ -22,28 +31,6 @@ const parseTextToBlocks = (text: string): { blocks: Array<TextBlock>, wordsCount
 		wordsCount += currentBlock.type === TextBlockType.WORD ? 1 : 0;
 	}
 	return { blocks: result, wordsCount };
-};
-
-const parseTextWithParagraphs = (text: string): Array<ParagraphBlock> => {
-	const result: Array<ParagraphBlock> = [];
-	if (text.length === 0) {
-		return [];
-	}
-	let prevParagraphIsEmpty: boolean = false;
-	text.split(/\n/).forEach((paragraphText: string) => {
-		if (paragraphText.length > 0 || !prevParagraphIsEmpty) {
-			result.push({
-				type: TextBlockType.PARAGRAPH,
-				hash: hashFunction(paragraphText),
-				content: paragraphText,
-				...parseTextToBlocks(paragraphText),
-			});
-			prevParagraphIsEmpty = paragraphText.length === 0;
-			return;
-		}
-		prevParagraphIsEmpty = false;
-	});
-	return result;
 };
 
 const hashFunction = (text: string): number => {
@@ -78,7 +65,6 @@ const removeCharacterFromBlock = (paragraph: ParagraphBlock, position: number): 
 
 export {
 	parseTextToBlocks,
-	parseTextWithParagraphs,
 	getParagraphByContent,
 	addCharacterToBlock,
 	removeCharacterFromBlock

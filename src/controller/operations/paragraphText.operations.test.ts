@@ -1,37 +1,33 @@
-import { addCharacterToBlock, getParagraphByContent, parseTextToBlocks, parseTextWithParagraphs, removeCharacterFromBlock } from "./paragraphText.operations";
+import { addCharacterToBlock, getParagraphByContent, parseTextToBlocks, removeCharacterFromBlock } from "./paragraphText.operations";
 import { ParagraphBlock, TextBlockType } from "../../model";
 
-it('empty', () => {
+it('parseTextToBlocks - empty', () => {
 	const result = parseTextToBlocks("");
 	expect(result).toHaveLength(0);
 });
 
-it('empty paragraph', () => {
-	const result = parseTextWithParagraphs("");
-	expect(result).toHaveLength(0);
-	expect(parseTextWithParagraphs("\n")).toHaveLength(1);
+it('parseTextToBlocks - normal text', () => {
+	const result = parseTextToBlocks("");
+	expect(result.blocks).toHaveLength(0);
 });
 
-it('partially empty paragraph', () => {
-	const result = parseTextWithParagraphs("\nHello");
-	expect(result).toHaveLength(2);
-	expect(parseTextWithParagraphs("Hello\nworld")).toHaveLength(2);
+it('parseTextToBlocks - partially empty paragraph', () => {
+	const result = parseTextToBlocks(" Hello");
+	expect(result.blocks).toHaveLength(2);
 });
 
-it('two paragraphs', () => {
-	const text = "Hello world!\nThis is me";
-	const result = parseTextWithParagraphs(text);
-	expect(result).toHaveLength(2);
-	expect(result[0].type).toEqual(TextBlockType.PARAGRAPH);
-	expect(result[1].type).toEqual(TextBlockType.PARAGRAPH);
-	expect((result[0] as ParagraphBlock).blocks).toHaveLength(4);
-	expect((result[1] as ParagraphBlock).blocks).toHaveLength(5);
+it('parseTextToBlocks - special characters like - ', () => {
+	const result = parseTextToBlocks("One-liner");
+	expect(result.blocks).toHaveLength(1);
 });
 
-it('line breaks paragraphs', () => {
-	const text = "Hello world!\n\nThis is me\n\n";
-	const result = parseTextWithParagraphs(text);
-	expect(result).toHaveLength(4);
+it('parseTextToBlocks - two words', () => {
+	const text = "Hello world";
+	const result = parseTextToBlocks(text);
+	expect(result.blocks).toHaveLength(3);
+	expect(result.blocks[0].type).toEqual(TextBlockType.WORD);
+	expect(result.blocks[1].type).toEqual(TextBlockType.WHITESPACE);
+	expect(result.blocks[1].type).toEqual(TextBlockType.WORD);
 });
 
 it("getParagraphByContent", () => {

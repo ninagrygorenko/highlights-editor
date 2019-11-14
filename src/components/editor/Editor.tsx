@@ -1,7 +1,7 @@
 import React, { FormEvent, useEffect, useRef } from "react";
 import { EditorModel, HasHighlight } from "../../model";
 import { none, Option } from "fp-ts/lib/Option";
-import { ParagraphBlock } from "../../model/TextBlock";
+import { ParagraphBlock } from "../../model";
 import { Paragraph } from "./Paragraph";
 import { getHighlightPredicate } from "../../utils/highlightPredicate.utils";
 import { useObservable } from "../../hooks/useObservable";
@@ -35,7 +35,7 @@ const Editor: React.FC<EditorProps> = props => {
 
 	useEffect(() => {
 		setCaretPositionInParagraph(editorDiv.current!, editorModel.caretPosition.paragraph, editorModel.caretPosition.offset);
-	}, [ editorModel ]);
+	}, [ editorModel, highlightsMap ]);
 
 	const handleBeforeInput = (event: FormEvent<HTMLDivElement>) => {
 		keyEventsController.handleBeforeInput(event, editorDiv.current!, editorModel);
@@ -55,7 +55,7 @@ const Editor: React.FC<EditorProps> = props => {
 				spellCheck={false}
 				onBeforeInput={handleBeforeInput}
 				onKeyDown={handleKeyDown}
-				onSelect={event => collapseSelection()} // just for simplicity
+				onSelect={() => collapseSelection()} // just for simplicity
 				suppressContentEditableWarning={true}
 				onPaste={event => event.preventDefault()} // just for simplicity
 			>
