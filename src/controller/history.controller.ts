@@ -10,7 +10,6 @@ class HistoryController {
 	private redoCommand: Queue<EditorCommand> = new Queue();
 
 	public addExecutedCommand(command: EditorCommand) {
-		console.log('addExecutedCommand:', command);
 		this.undoCommands.add(command);
 		this.redoCommand.clear(); // no redo after new commands
 	}
