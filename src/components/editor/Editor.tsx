@@ -5,10 +5,10 @@ import { ParagraphBlock } from "../../model/TextBlock";
 import { Paragraph } from "./Paragraph";
 import { getHighlightPredicate } from "../../utils/highlightPredicate.utils";
 import { useObservable } from "../../hooks/useObservable";
-import { setCaretPositionInParagraph } from "../../model/operations/editorOperations";
 import { EditorController } from "../../controller/editor.controller";
 import { KeyEventsController } from "../../controller/keyEvents.controller";
 import { HighlightsController } from "../../controller/highlights.controller";
+import { collapseSelection, setCaretPositionInParagraph } from "../../controller/operations/selection.operations";
 
 export interface EditorProps {
 	editorController: EditorController;
@@ -47,7 +47,6 @@ const Editor: React.FC<EditorProps> = props => {
 
 	const blocks = editorModel.content;
 	let totalWorldCounter = 0;
-	console.log("render editor");
 	return (
 		<div className="editor" >
 			<div
@@ -56,7 +55,9 @@ const Editor: React.FC<EditorProps> = props => {
 				spellCheck={false}
 				onBeforeInput={handleBeforeInput}
 				onKeyDown={handleKeyDown}
+				onSelect={event => collapseSelection()} // just for simplicity
 				suppressContentEditableWarning={true}
+				onPaste={event => event.preventDefault()} // just for simplicity
 			>
 				{blocks.map((paragraphBlock: ParagraphBlock, index: number) => {
 					const key = totalWorldCounter + (paragraphBlock.wordsCount > 0 ? paragraphBlock.hash : index);

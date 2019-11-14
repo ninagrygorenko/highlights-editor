@@ -47,6 +47,9 @@ const Paragraph: React.FC<ParagraphProps> = props => {
 			}
 		}
 	});
+	if (text.charAt(text.length - 1) === " ") {
+		text = text.slice(0, text.length - 1) + "\u00A0";
+	}
 	if (text) {
 		renderedText.push(text);
 	}

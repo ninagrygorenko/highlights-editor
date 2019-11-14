@@ -4,9 +4,8 @@ import { HistoryController } from "./history.controller";
 import { AddHighlightCommand, EditorModel, EditorStateChangeCommand } from "../model";
 import { EditorController } from "./editor.controller";
 import { getConstantTextAddFlush$, getEditorStateFlush$, getEditorStateHistoryCommands } from "./editor.controller.utils";
-import { getParagraphByContent } from "../model/operations/paragraphOperations";
-import { isSome } from "fp-ts/lib/Option";
 import * as React from "react";
+import { getParagraphByContent } from "./operations/paragraphText.operations";
 
 it("getEditorStateHistoryCommands", () => {
 	const history: HistoryController = new HistoryController();
@@ -44,7 +43,7 @@ describe("editor state flush to history", () => {
 		return result;
 	};
 	const simulateNonVisualCharacterPressed = (text: string): string => {
-		keyEventsController.nonCharacterAddAction.next(textToEditorModel(text + "|"));
+		keyEventsController.nonVisualCharacterAddAction$.next(textToEditorModel(text + "|"));
 		return text;
 	};
 	const simulateHighlightCommand = (wordNumber: number = 0) => {

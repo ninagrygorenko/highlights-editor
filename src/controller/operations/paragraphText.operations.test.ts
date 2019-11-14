@@ -1,11 +1,5 @@
-import {
-	addCharacterToBlock,
-	getParagraphByContent,
-	parseTextToBlocks,
-	parseTextWithParagraphs,
-	removeCharacterFromBlock,
-} from "./paragraphOperations";
-import { ParagraphBlock, TextBlockType } from "../TextBlock";
+import { addCharacterToBlock, getParagraphByContent, parseTextToBlocks, parseTextWithParagraphs, removeCharacterFromBlock } from "./paragraphText.operations";
+import { ParagraphBlock, TextBlockType } from "../../model";
 
 it('empty', () => {
 	const result = parseTextToBlocks("");
@@ -103,4 +97,3 @@ it("removeCharacterFromBlock", () => {
 	expect(paragraphBlock.blocks[0].type).toEqual(TextBlockType.WORD);
 	expect(paragraphBlock.content).toEqual("bbc");
 });
-

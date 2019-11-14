@@ -33,7 +33,7 @@ class EditorController {
 		// initialize content$ subject
 		merge(
 			this.keyEventsController.characterAddedAction$.asObservable(),
-			this.keyEventsController.nonCharacterAddAction.asObservable(),
+			this.keyEventsController.nonVisualCharacterAddAction$.asObservable(),
 			getEditorStateHistoryCommands(this.historyController),
 		).subscribe(editorState => this.content$.next(editorState));
 		this.initializeEditorStateHistoryFlush();
@@ -46,7 +46,6 @@ class EditorController {
 		this.keyEventsController.undoObserver$.pipe(
 			delay(100)
 		).subscribe(undo => {
-			console.log("undo");
 			undo.preventDefault();
 			this.historyController.undoLastCommand();
 		});
@@ -54,7 +53,6 @@ class EditorController {
 
 	private initializeRedoHandler = () => {
 		this.keyEventsController.redoObserver$.subscribe(redo => {
-			console.log("redo");
 			redo.preventDefault();
 			this.historyController.redoLastCommand();
 		});

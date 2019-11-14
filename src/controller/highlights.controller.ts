@@ -97,15 +97,6 @@ class HighlightsController {
 			}
 		});
 	};
-
-	public addHighlightTestData = () => {
-		// test data
-		this.highlightCommand$.next(new AddHighlightCommand(5, "f0f"));
-		this.highlightCommand$.next(new AddHighlightCommand(1, "ff0"));
-		this.highlightCommand$.next(new AddHighlightCommand(1, "f00"));
-		this.highlightCommand$.next(new AddHighlightCommand(2, "0fe"));
-		// end test data
-	}
 }
 
 export {

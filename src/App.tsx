@@ -10,6 +10,7 @@ import { HighlightsController } from "./controller/highlights.controller";
 import { EditorController } from "./controller/editor.controller";
 import { KeyEventsController } from "./controller/keyEvents.controller";
 
+// maybe it would be nice to put these controllers into React.Context and access them in components
 const historyController: HistoryController = new HistoryController();
 const keyEventsController: KeyEventsController = new KeyEventsController();
 const highlightsController: HighlightsController = new HighlightsController(historyController);

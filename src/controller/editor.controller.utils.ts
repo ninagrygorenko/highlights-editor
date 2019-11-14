@@ -23,13 +23,12 @@ const getEditorStateHistoryCommands = (historyController: HistoryController): Ob
  */
 const getConstantTextAddFlush$ = (
 	keyEventsController: KeyEventsController, highlightsController: HighlightsController) => {
-	return merge(
-		keyEventsController.characterAddedAction$.asObservable(),
-	).pipe(
+	return keyEventsController.characterAddedAction$.asObservable().pipe(
 		bufferWhen(() => merge(
-			keyEventsController.nonCharacterAddAction.asObservable(),
+			keyEventsController.nonVisualCharacterAddAction$.asObservable(),
 			keyEventsController.undoObserver$,
 			highlightsController.highlightCommand$.asObservable(),
+			keyEventsController.otherKeyEvents$.asObservable(),
 		)),
 		filter(editorStates => editorStates.length > 0),
 		map(editorStates => editorStates[editorStates.length - 1])
@@ -45,7 +44,7 @@ const getEditorStateFlush$ = (
 ) => {
 	return merge(
 		getConstantTextAddFlush$(keyEventsController, highlightsController),
-		keyEventsController.nonCharacterAddAction.asObservable(),
+		keyEventsController.nonVisualCharacterAddAction$.asObservable(),
 	);
 };
 

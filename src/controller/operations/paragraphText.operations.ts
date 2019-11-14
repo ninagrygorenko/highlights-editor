@@ -1,4 +1,4 @@
-import { ParagraphBlock, TextBlock, TextBlockType } from "../TextBlock";
+import { ParagraphBlock, TextBlock, TextBlockType } from "../../model";
 
 const wordLetterRegexp = /[0-9a-zA-z-]/;
 

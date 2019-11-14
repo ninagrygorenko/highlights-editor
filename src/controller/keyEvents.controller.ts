@@ -1,15 +1,22 @@
 import React, { FormEvent, KeyboardEvent } from "react";
 import { EditorModel } from "../model";
-import { addCharacterInCurrentPosition, deleteCharacterInCurrentPosition, removeCharacterInCurrentPosition } from "../model/operations/editorOperations";
 import { Observable, Subject } from "rxjs";
 import { filter } from "rxjs/operators";
+import { getCurrentParagraph } from "../utils/editor.utils";
+import {
+	addCharacterInCurrentPosition,
+	deleteCharacterInCurrentPosition,
+	removeCharacterInCurrentPosition,
+	updateCaretPosition
+} from "./operations/editor.operations";
 
 class KeyEventsController {
 
 	public keyDownEvents$: Subject<KeyboardEvent> = new Subject();
 	public appKeyDownEvents$: Subject<KeyboardEvent> = new Subject();
 	public characterAddedAction$: Subject<EditorModel> = new Subject();
-	public nonCharacterAddAction: Subject<EditorModel> = new Subject();
+	public nonVisualCharacterAddAction$: Subject<EditorModel> = new Subject();
+	public otherKeyEvents$: Subject<EditorModel> = new Subject(); /* such as arrows */
 
 	public undoObserver$: Observable<KeyboardEvent> = this.appKeyDownEvents$.asObservable().pipe(
 		filter(event => this.isUndo(event))
@@ -21,7 +28,6 @@ class KeyEventsController {
 	public handleAppKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
 		if (this.isUndo(event) || this.isRedo(event)) {
 			event.preventDefault();
-			event.stopPropagation();
 		}
 		this.appKeyDownEvents$.next(event);
 	};
@@ -31,11 +37,17 @@ class KeyEventsController {
 		switch (event.key) {
 			case 'Backspace':
 				event.preventDefault();
-				this.nonCharacterAddAction.next(removeCharacterInCurrentPosition(currentEditorModel, div));
+				this.nonVisualCharacterAddAction$.next(removeCharacterInCurrentPosition(currentEditorModel, getCurrentParagraph(currentEditorModel, div)));
 				break;
 			case 'Delete':
 				event.preventDefault();
-				this.nonCharacterAddAction.next(deleteCharacterInCurrentPosition(currentEditorModel, div));
+				this.nonVisualCharacterAddAction$.next(deleteCharacterInCurrentPosition(currentEditorModel, getCurrentParagraph(currentEditorModel, div)));
+				break;
+			case 'ArrowLeft':
+			case 'ArrowRight':
+			case 'ArrowUp':
+			case 'ArrowDown':
+				this.otherKeyEvents$.next(updateCaretPosition(currentEditorModel, getCurrentParagraph(currentEditorModel, div)));
 				break;
 		}
 	};
@@ -43,13 +55,10 @@ class KeyEventsController {
 	public handleBeforeInput = (event: FormEvent<HTMLDivElement>, div: HTMLDivElement, currentEditorModel: EditorModel): void => {
 		event.preventDefault();
 		let newKey = (event as any).data;
-		if (newKey === ' ') {
-			newKey = '\u00A0';
-		}
-		const nextEditorState = addCharacterInCurrentPosition(newKey, currentEditorModel, div);
+		const nextEditorState = addCharacterInCurrentPosition(newKey, currentEditorModel, getCurrentParagraph(currentEditorModel, div));
 		switch (newKey) {
 			case '\n':
-				this.nonCharacterAddAction.next(nextEditorState);
+				this.nonVisualCharacterAddAction$.next(nextEditorState);
 				break;
 			default:
 				this.characterAddedAction$.next(nextEditorState);

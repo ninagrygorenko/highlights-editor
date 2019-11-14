@@ -1,3 +1,7 @@
+import { Option } from "fp-ts/es6/Option";
+import { isSome } from "fp-ts/lib/Option";
+import { ParagraphBlock } from "../../model";
+
 const getCaretNode = (editorDiv: HTMLDivElement): Element | null => {
 	const selection: Selection | null = window.getSelection();
 	let element = null;
@@ -82,8 +86,25 @@ const setCaretPositionInElement = (editorDiv: HTMLDivElement, targetElement: HTM
 	}
 };
 
+const setCaretPositionInParagraph = (editorDiv: HTMLDivElement, paragraph: Option<ParagraphBlock>, offset: number): void => {
+	if (isSome(paragraph) && paragraph.value.ref) {
+		setCaretPositionInElement(editorDiv, paragraph.value.ref, offset);
+	} else {
+		setCaretPositionInElement(editorDiv, editorDiv, offset);
+	}
+};
+
+const collapseSelection = (): void => {
+	let selection = window.getSelection();
+	if (selection) {
+		selection.collapseToStart();
+	}
+};
+
 export {
 	getCaretCharacterOffsetWithin,
 	getCaretNode,
+	collapseSelection,
 	setCaretPositionInElement,
+	setCaretPositionInParagraph,
 };
