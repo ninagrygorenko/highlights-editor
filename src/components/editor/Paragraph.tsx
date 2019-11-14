@@ -50,9 +50,10 @@ const Paragraph: React.FC<ParagraphProps> = props => {
 		renderedText.push(text);
 	}
 	if (renderedText.length === 0) {
-		renderedText.push(<br/>);
+		renderedText.push(<br key={'br'}/>);
 	}
 	const key = paragraphBlock.blocks.length > 0 ? paragraphBlock.hash : `p${index}`;
+	console.log(key);
 	return (
 		<div key={key}>
 			{renderedText}

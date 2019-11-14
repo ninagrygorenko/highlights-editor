@@ -73,13 +73,3 @@ describe("editorModel.operations", () => {
 		expect(result.content[0].content).toEqual("Hello world!");
 	});
 });
-/*
-const replaceParagraph = (editorModel: EditorModel, oldParagraph: ParagraphBlock, newParagraph: ParagraphBlock): EditorModel => {
-	const newModel = {...editorModel};
-	newModel.content = newModel.content.map((p: ParagraphBlock): ParagraphBlock => {
-		return p === oldParagraph ? newParagraph : p;
-	});
-
-	return newModel;
-};
-*/
