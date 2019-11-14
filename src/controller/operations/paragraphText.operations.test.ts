@@ -3,31 +3,31 @@ import { ParagraphBlock, TextBlockType } from "../../model";
 
 it('parseTextToBlocks - empty', () => {
 	const result = parseTextToBlocks("");
-	expect(result.blocks).toHaveLength(0);
+	expect(result).toHaveLength(0);
 });
 
 it('parseTextToBlocks - normal text', () => {
 	const result = parseTextToBlocks("");
-	expect(result.blocks).toHaveLength(0);
+	expect(result).toHaveLength(0);
 });
 
 it('parseTextToBlocks - partially empty paragraph', () => {
 	const result = parseTextToBlocks(" Hello");
-	expect(result.blocks).toHaveLength(2);
+	expect(result).toHaveLength(2);
 });
 
 it('parseTextToBlocks - special characters like - ', () => {
 	const result = parseTextToBlocks("One-liner");
-	expect(result.blocks).toHaveLength(1);
+	expect(result).toHaveLength(1);
 });
 
 it('parseTextToBlocks - two words', () => {
 	const text = "Hello world";
 	const result = parseTextToBlocks(text);
-	expect(result.blocks).toHaveLength(3);
-	expect(result.blocks[0].type).toEqual(TextBlockType.WORD);
-	expect(result.blocks[1].type).toEqual(TextBlockType.WHITESPACE);
-	expect(result.blocks[2].type).toEqual(TextBlockType.WORD);
+	expect(result).toHaveLength(3);
+	expect(result[0].type).toEqual(TextBlockType.WORD);
+	expect(result[1].type).toEqual(TextBlockType.WHITESPACE);
+	expect(result[2].type).toEqual(TextBlockType.WORD);
 });
 
 it("getParagraphByContent", () => {
@@ -47,7 +47,7 @@ it("addCharacterToBlock", () => {
 		type: TextBlockType.PARAGRAPH,
 		content: "",
 		blocks: [],
-		wordsCount: 0,
+		wordsHighlighted: 0,
 		hash: 0
 	};
 

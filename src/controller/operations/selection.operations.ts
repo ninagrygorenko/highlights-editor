@@ -1,6 +1,6 @@
 import { Option } from "fp-ts/es6/Option";
-import { isSome } from "fp-ts/lib/Option";
-import { ParagraphBlock } from "../../model";
+import { isNone } from "fp-ts/lib/Option";
+import { EditorModel, ParagraphBlock } from "../../model";
 
 const getCaretNode = (editorDiv: HTMLDivElement): Element | null => {
 	const selection: Selection | null = window.getSelection();
@@ -55,7 +55,7 @@ const moveCursor = (targetNode: Node, targetOffset: number) => {
 	}
 };
 
-const setCaretPositionInElement = (editorDiv: HTMLDivElement, targetElement: HTMLElement, targetOffset: number): void => {
+const setCaretPositionInElement = (editorDiv: HTMLDivElement, targetElement: Element, targetOffset: number): void => {
 	if (targetOffset === 0) {
 		// find element index in editorDiv and set cursor there
 		moveCursor(editorDiv, getElementIndexInDiv(editorDiv, targetElement));
@@ -86,12 +86,17 @@ const setCaretPositionInElement = (editorDiv: HTMLDivElement, targetElement: HTM
 	}
 };
 
-const setCaretPositionInParagraph = (editorDiv: HTMLDivElement, paragraph: Option<ParagraphBlock>, offset: number): void => {
-	if (isSome(paragraph) && paragraph.value.ref) {
-		setCaretPositionInElement(editorDiv, paragraph.value.ref, offset);
-	} else {
-		setCaretPositionInElement(editorDiv, editorDiv, offset);
+const getElementByParagraph = (editorState: EditorModel, editorDiv: HTMLDivElement, paragraph: Option<ParagraphBlock>): Element => {
+	if (isNone(paragraph)) {
+		return editorDiv;
 	}
+	const paragraphIndex = editorState.content.indexOf(paragraph.value);
+	return editorDiv.children.item(paragraphIndex) || editorDiv;
+};
+
+const setCaretPositionInParagraph = (editorState: EditorModel, editorDiv: HTMLDivElement, paragraph: Option<ParagraphBlock>, offset: number): void => {
+	const element = getElementByParagraph(editorState, editorDiv, paragraph);
+	setCaretPositionInElement(editorDiv, element, offset);
 };
 
 const collapseSelection = (): void => {

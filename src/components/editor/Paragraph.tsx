@@ -1,22 +1,20 @@
 import React from "react";
-import { HasHighlight, ParagraphBlock, TextBlock, TextBlockType } from "../../model";
+import { ParagraphBlock, TextBlock, TextBlockType } from "../../model";
 import { isSome, Option } from "fp-ts/lib/Option";
 import { HighlightedWord } from "./HighlightedWord";
 
 export interface ParagraphProps {
 	index: number;
 	paragraphBlock: ParagraphBlock;
-	highlightPredicate: (index: number) => Option<HasHighlight>;
 	onMouseOverHighlightedWord: (id: string, isMouseOver: boolean) => void;
 	mouseOverHighlightedWord: Option<string>;
 }
 
 const Paragraph: React.FC<ParagraphProps> = props => {
-	const { index, paragraphBlock, highlightPredicate } = props;
+	const { index, paragraphBlock } = props;
 
 	const renderedText: Array<React.ReactFragment> = [];
 	let text: string = "";
-	let wordIndex = 0;
 	paragraphBlock.blocks.forEach((textBlock: TextBlock) => {
 		switch (textBlock.type) {
 			case TextBlockType.WHITESPACE: {
@@ -24,20 +22,18 @@ const Paragraph: React.FC<ParagraphProps> = props => {
 				break;
 			}
 			case TextBlockType.WORD: {
-				const highlightResult = highlightPredicate(wordIndex);
-				wordIndex++;
-				if (isSome(highlightResult)) {
+				if (isSome(textBlock.highlight)) {
 					if (text) {
 						renderedText.push(text);
 						text = "";
 					}
 					const isMouseOver = isSome(props.mouseOverHighlightedWord)
-						? props.mouseOverHighlightedWord.value === highlightResult.value.id
+						? props.mouseOverHighlightedWord.value === textBlock.highlight.value.id
 						: false;
 					renderedText.push(<HighlightedWord
-						key={highlightResult.value.id}
+						key={textBlock.highlight.value.id}
 						word={textBlock.content}
-						highlightCommand={highlightResult.value}
+						highlightCommand={textBlock.highlight.value}
 						onMouseOver={props.onMouseOverHighlightedWord}
 						isMouseOver={isMouseOver}/>);
 				} else {
@@ -46,6 +42,7 @@ const Paragraph: React.FC<ParagraphProps> = props => {
 			}
 		}
 	});
+	// to prevent collapse of the space symbol at the end of the paragraph -> display it as &nbsp;
 	if (text.charAt(text.length - 1) === " ") {
 		text = text.slice(0, text.length - 1) + "\u00A0";
 	}
@@ -57,7 +54,7 @@ const Paragraph: React.FC<ParagraphProps> = props => {
 	}
 	const key = paragraphBlock.blocks.length > 0 ? paragraphBlock.hash : `p${index}`;
 	return (
-		<div key={key} ref={ref => paragraphBlock.ref = ref}>
+		<div key={key}>
 			{renderedText}
 		</div>);
 };

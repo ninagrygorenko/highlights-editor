@@ -1,10 +1,10 @@
-import { BehaviorSubject, merge, Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { none, Option, some } from "fp-ts/lib/Option";
 import { HighlightsController } from "./highlights.controller";
 import { EditorModel, EditorStateChangeCommand } from "../model";
 import { HistoryController } from "./history.controller";
 import { KeyEventsController } from "./keyEvents.controller";
-import { getEditorStateFlush$, getEditorStateHistoryCommands } from "./editor.controller.utils";
+import { getContentWithHighlights$, getEditorStateFlush$ } from "./editor.controller.utils";
 import { delay } from "rxjs/operators";
 
 class EditorController {
@@ -31,11 +31,8 @@ class EditorController {
 
 	private initialize = () => {
 		// initialize content$ subject
-		merge(
-			this.keyEventsController.characterAddedAction$.asObservable(),
-			this.keyEventsController.nonVisualCharacterAddAction$.asObservable(),
-			getEditorStateHistoryCommands(this.historyController),
-		).subscribe(editorState => this.content$.next(editorState));
+		getContentWithHighlights$(this.keyEventsController, this.highlightController, this.historyController)
+			.subscribe(editorState => this.content$.next(editorState));
 		this.initializeEditorStateHistoryFlush();
 		this.initializeUndoHandler();
 		this.initializeRedoHandler();

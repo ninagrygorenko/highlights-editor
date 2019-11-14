@@ -1,12 +1,12 @@
 import { ParagraphBlock, TextBlock, TextBlockType } from "../../model";
+import { none } from "fp-ts/lib/Option";
 
 const wordLetterRegexp = /[0-9a-zA-z]/;
 const inWordNonLetterRegexp = /[-']/;
 
-const parseTextToBlocks = (text: string): { blocks: Array<TextBlock>, wordsCount: number } => {
+const parseTextToBlocks = (text: string): Array<TextBlock> => {
 	const result: Array<TextBlock> = [];
-	let wordsCount = 0;
-	let currentBlock: TextBlock = { type: TextBlockType.WORD, content: ""};
+	let currentBlock: TextBlock = { type: TextBlockType.WORD, content: "", highlight: none };
 	for (let i = 0; i < text.length; i++) {
 		let charType = text[i].match(wordLetterRegexp) ? TextBlockType.WORD : TextBlockType.WHITESPACE;
 
@@ -21,16 +21,14 @@ const parseTextToBlocks = (text: string): { blocks: Array<TextBlock>, wordsCount
 			if (currentBlock.content.length > 0) {
 				result.push(currentBlock);
 			}
-			wordsCount += currentBlock.type === TextBlockType.WORD ? 1 : 0;
-			currentBlock = { type: charType, content: ""};
+			currentBlock = { type: charType, content: "", highlight: none } as TextBlock;
 		}
 		currentBlock.content += text[i];
 	}
 	if (currentBlock.content.length > 0) {
 		result.push(currentBlock);
-		wordsCount += currentBlock.type === TextBlockType.WORD ? 1 : 0;
 	}
-	return { blocks: result, wordsCount };
+	return result;
 };
 
 const hashFunction = (text: string): number => {
@@ -47,9 +45,10 @@ const hashFunction = (text: string): number => {
 const getParagraphByContent = (paragraphText: string): ParagraphBlock => {
 	return {
 		type: TextBlockType.PARAGRAPH,
+		wordsHighlighted: 0,
 		content: paragraphText,
 		hash: hashFunction(paragraphText),
-		...parseTextToBlocks(paragraphText)
+		blocks: parseTextToBlocks(paragraphText)
 	};
 };
 

@@ -1,9 +1,8 @@
 import React, { FormEvent, useEffect, useRef } from "react";
-import { EditorModel, HasHighlight } from "../../model";
+import { EditorModel } from "../../model";
 import { none, Option } from "fp-ts/lib/Option";
 import { ParagraphBlock } from "../../model";
 import { Paragraph } from "./Paragraph";
-import { getHighlightPredicate } from "../../utils/highlightPredicate.utils";
 import { useObservable } from "../../hooks/useObservable";
 import { EditorController } from "../../controller/editor.controller";
 import { KeyEventsController } from "../../controller/keyEvents.controller";
@@ -22,7 +21,6 @@ const Editor: React.FC<EditorProps> = props => {
 
 	const editorModel = useObservable<EditorModel>(editorController.content$, EditorController.INITIAL_EDITOR_MODEL);
 	const mouseOverHighlightedWord = useObservable<Option<string>>(editorController.mouseOverHighlightedWord$, none);
-	const highlightsMap = useObservable<Record<number, HasHighlight[]>>(highlightsController.editorHighlights$, {});
 
 	useEffect(() => {
 		const s = highlightsController.highlightCommand$.subscribe(() => {
@@ -34,8 +32,8 @@ const Editor: React.FC<EditorProps> = props => {
 	});
 
 	useEffect(() => {
-		setCaretPositionInParagraph(editorDiv.current!, editorModel.caretPosition.paragraph, editorModel.caretPosition.offset);
-	}, [ editorModel, highlightsMap ]);
+		setCaretPositionInParagraph(editorModel, editorDiv.current!, editorModel.caretPosition.paragraph, editorModel.caretPosition.offset);
+	}, [ editorModel ]);
 
 	const handleBeforeInput = (event: FormEvent<HTMLDivElement>) => {
 		keyEventsController.handleBeforeInput(event, editorDiv.current!, editorModel);
@@ -46,7 +44,6 @@ const Editor: React.FC<EditorProps> = props => {
 	};
 
 	const blocks = editorModel.content;
-	let totalWorldCounter = 0;
 	return (
 		<div className="editor" >
 			<div
@@ -60,17 +57,16 @@ const Editor: React.FC<EditorProps> = props => {
 				onPaste={event => event.preventDefault()} // just for simplicity
 			>
 				{blocks.map((paragraphBlock: ParagraphBlock, index: number) => {
-					const key = totalWorldCounter + (paragraphBlock.wordsCount > 0 ? paragraphBlock.hash : index);
-					const renderer = <Paragraph
+					const key = paragraphBlock.blocks.length > 0
+						? `${paragraphBlock.hash}${paragraphBlock.wordsHighlighted}`
+						: index;
+					return <Paragraph
 						key={key}
 						index={index}
 						paragraphBlock={paragraphBlock}
-						highlightPredicate={getHighlightPredicate(highlightsMap, totalWorldCounter)}
 						onMouseOverHighlightedWord={editorController.setHighlightedWordMouseOver}
 						mouseOverHighlightedWord={mouseOverHighlightedWord}
 					/>;
-					totalWorldCounter += paragraphBlock.wordsCount;
-					return renderer;
 				})}
 			</div>
 		</div>);

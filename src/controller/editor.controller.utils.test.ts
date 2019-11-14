@@ -3,14 +3,14 @@ import { HighlightsController } from "./highlights.controller";
 import { HistoryController } from "./history.controller";
 import { AddHighlightCommand, EditorModel, EditorStateChangeCommand } from "../model";
 import { EditorController } from "./editor.controller";
-import { getConstantTextAddFlush$, getEditorStateFlush$, getEditorStateHistoryCommands } from "./editor.controller.utils";
+import { getConstantTextAddFlush$, getEditorStateFlush$, getEditorStateHistoryCommands$ } from "./editor.controller.utils";
 import * as React from "react";
 import { getParagraphByContent } from "./operations/paragraphText.operations";
 
-it("getEditorStateHistoryCommands", () => {
+it("getEditorStateHistoryCommands$", () => {
 	const history: HistoryController = new HistoryController();
 	const result: Array<EditorModel> = [];
-	getEditorStateHistoryCommands(history).subscribe(val => result.push(val));
+	getEditorStateHistoryCommands$(history).subscribe(val => result.push(val));
 
 	history.addExecutedCommand(new AddHighlightCommand(0, 'ccc'));
 	history.undoLastCommand();

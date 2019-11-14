@@ -2,7 +2,7 @@ import React, { FormEvent, KeyboardEvent } from "react";
 import { EditorModel } from "../model";
 import { Observable, Subject } from "rxjs";
 import { filter } from "rxjs/operators";
-import { getCurrentParagraph } from "../utils/editor.utils";
+import { getCurrentParagraphInfo } from "../utils/editor.utils";
 import {
 	addCharacterInCurrentPosition,
 	deleteCharacterInCurrentPosition,
@@ -37,17 +37,17 @@ class KeyEventsController {
 		switch (event.key) {
 			case 'Backspace':
 				event.preventDefault();
-				this.nonVisualCharacterAddAction$.next(removeCharacterInCurrentPosition(currentEditorModel, getCurrentParagraph(currentEditorModel, div)));
+				this.nonVisualCharacterAddAction$.next(removeCharacterInCurrentPosition(currentEditorModel, getCurrentParagraphInfo(currentEditorModel, div)));
 				break;
 			case 'Delete':
 				event.preventDefault();
-				this.nonVisualCharacterAddAction$.next(deleteCharacterInCurrentPosition(currentEditorModel, getCurrentParagraph(currentEditorModel, div)));
+				this.nonVisualCharacterAddAction$.next(deleteCharacterInCurrentPosition(currentEditorModel, getCurrentParagraphInfo(currentEditorModel, div)));
 				break;
 			case 'ArrowLeft':
 			case 'ArrowRight':
 			case 'ArrowUp':
 			case 'ArrowDown':
-				this.otherKeyEvents$.next(updateCaretPosition(currentEditorModel, getCurrentParagraph(currentEditorModel, div)));
+				this.otherKeyEvents$.next(updateCaretPosition(currentEditorModel, getCurrentParagraphInfo(currentEditorModel, div)));
 				break;
 		}
 	};
@@ -55,7 +55,7 @@ class KeyEventsController {
 	public handleBeforeInput = (event: FormEvent<HTMLDivElement>, div: HTMLDivElement, currentEditorModel: EditorModel): void => {
 		event.preventDefault();
 		let newKey = (event as any).data;
-		const nextEditorState = addCharacterInCurrentPosition(newKey, currentEditorModel, getCurrentParagraph(currentEditorModel, div));
+		const nextEditorState = addCharacterInCurrentPosition(newKey, currentEditorModel, getCurrentParagraphInfo(currentEditorModel, div));
 		switch (newKey) {
 			case '\n':
 				this.nonVisualCharacterAddAction$.next(nextEditorState);
